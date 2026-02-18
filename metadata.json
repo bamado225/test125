@@ -1,0 +1,7 @@
+{
+  "name": "Kent Kasper Coaching",
+  "description": "Premium acting and branding coaching website with AI-powered brand analysis and scheduling features.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

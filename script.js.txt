@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kent Kasper | Acting & Branding Coach</title>
+    <meta name="description" content="Hollywood's top acting coach with 35+ years experience. Branding, marketing, audition coaching & career mentoring for actors.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">KENT KASPER</a>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <h1 class="hero-title">Don't Fight Your Type,<br><span class="highlight">Master It!</span></h1>
+            <p class="hero-subtitle">Hollywood's Top Acting & Branding Coach</p>
+            <p class="hero-description">35+ years SAG-AFTRA experience | Branding • Marketing • Audition Coaching</p>
+            <div class="hero-buttons">
+                <a href="#contact" class="btn btn-primary">Book a Session</a>
+                <a href="#about" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-scroll">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">WHO I AM</span>
+                <h2 class="section-title">About Kent Kasper</h2>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <p class="lead">No other coach comes close to offering the kind of above-and-beyond personal mentoring and coaching that Kent offers.</p>
+                    <p>With over 35 years as a SAG-AFTRA working actor, Kent Kasper has been in over 200 commercials, appeared in 25+ television shows including Mad Men, Monk, and Rules of Engagement, and featured in 20 films including Space Jam and Apollo 13.</p>
+                    <div class="experience-grid">
+                        <div class="exp-item">
+                            <h3>12+ Years</h3>
+                            <p>National Headliner Stand-Up Comedian</p>
+                        </div>
+                        <div class="exp-item">
+                            <h3>200+</h3>
+                            <p>National & International Commercials</p>
+                        </div>
+                        <div class="exp-item">
+                            <h3>25+</h3>
+                            <p>Television Shows</p>
+                        </div>
+                        <div class="exp-item">
+                            <h3>20+</h3>
+                            <p>Feature Films</p>
+                        </div>
+                    </div>
+                    <p><strong>Part Mentor, Part Life Coach. A splash of Muse with a dash of Magic.</strong></p>
+                    <p>Kent specializes in audition preparation, branding, marketing, and packaging. He teaches you how to brand, market, and package yourself, giving you a competitive edge that will turn you into a working actor with representation in major markets in a matter of months.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">WHAT I OFFER</span>
+                <h2 class="section-title">Services</h2>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">🎭</div>
+                    <h3>Audition Coaching</h3>
+                    <p>Master the audition room with proven techniques. From cold reading to self-tape perfection, I'll prepare you to book the room every time.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">✨</div>
+                    <h3>Branding & Marketing</h3>
+                    <p>Discover and master your type. Learn how to package yourself professionally and stand out to casting directors, agents, and managers.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">📸</div>
+                    <h3>Headshot Consultation</h3>
+                    <p>Get expert guidance on selecting the perfect headshots that book jobs. I'll help you choose looks that showcase your marketability.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🎬</div>
+                    <h3>Demo Reel Prep</h3>
+                    <p>Create a compelling demo reel that gets you noticed. Strategic planning and coaching to showcase your best work.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🤝</div>
+                    <h3>Agent/Manager Blitz</h3>
+                    <p>Get connected with top representation. I'll help you prepare and pitch to agents and managers in major markets.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">👨‍👩‍👧‍👦</div>
+                    <h3>Family Coaching</h3>
+                    <p>From diapers to depends! I work with actors of all ages including children, teens, adults, couples, and families. Licensed CPS permit holder.</p>
+                </div>
+            </div>
+            <div class="coaching-formats">
+                <h3>Available Sessions</h3>
+                <ul>
+                    <li>One-on-One Coaching (In-Person or Virtual)</li>
+                    <li>FaceTime, Zoom, Instagram & Facebook Messenger</li>
+                    <li>Self-Tape Preparation & Review</li>
+                    <li>Career Consultations</li>
+                    <li>Package Deals Available</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">SUCCESS STORIES</span>
+                <h2 class="section-title">What Students Say</h2>
+            </div>
+            <div class="testimonials-slider">
+                <div class="testimonial-track" id="testimonialTrack">
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <p>"Kent Kasper is the real deal! His knowledge about the business is priceless. Without his guidance I wouldn't have made it to the next level. Thank you coach!"</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <strong>Tank Kelly</strong>
+                            <span>Working Actor, 5 Years with Kent</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <p>"Within just three months I have all my marketing materials together and within 5 days of submitting I already have my first agent! This wouldn't have happened without Kent Kasper."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <strong>Emily See</strong>
+                            <span>Recently Signed Actor</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <p>"Kent has helped me significantly improve my audition skills. I learned more in one session than I have in any other training. He's the best!"</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <strong>Felix Ysais</strong>
+                            <span>TV & Film Actor</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <p>"I booked my first feature film! Kent's coaching session made all the difference. I walked on set feeling prepared and confident. You're awesome Kent!"</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <strong>Vallarie Golden</strong>
+                            <span>Film Actress</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <p>"Kent helped me land top tier representation in just weeks! His strategic approach and industry knowledge is unmatched. Highly recommend!"</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <strong>Brian Howard</strong>
+                            <span>Represented Actor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-controls">
+                <button class="testimonial-btn" id="prevBtn">←</button>
+                <button class="testimonial-btn" id="nextBtn">→</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Take Your Career to the Next Level?</h2>
+            <p>Book a consultation today and start your journey to becoming a working actor</p>
+            <a href="#contact" class="btn btn-primary btn-large">Get Started Now</a>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">GET IN TOUCH</span>
+                <h2 class="section-title">Contact Kent</h2>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Let's Work Together</h3>
+                    <p>Whether you're just starting out or looking to take your career to the next level, I'm here to help guide you through every step of your journey.</p>
+                    <div class="contact-methods">
+                        <div class="contact-item">
+                            <div class="contact-icon">📧</div>
+                            <div>
+                                <h4>Email</h4>
+                                <a href="mailto:kentkasper@gmail.com">kentkasper@gmail.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">📱</div>
+                            <div>
+                                <h4>Social Media</h4>
+                                <p>Connect on Facebook & Instagram</p>
+                                <p><strong>@kent_kasper</strong></p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">🎥</div>
+                            <div>
+                                <h4>Virtual Coaching</h4>
+                                <p>Available via Zoom, FaceTime, or Video Call</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/kent.kasper" target="_blank" class="social-btn">Facebook</a>
+                        <a href="https://www.instagram.com/kent_kasper" target="_blank" class="social-btn">Instagram</a>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <input type="text" id="name" name="name" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" name="email" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" id="phone" name="phone" placeholder="Phone Number">
+                        </div>
+                        <div class="form-group">
+                            <select id="service" name="service" required>
+                                <option value="">Select a Service</option>
+                                <option value="audition">Audition Coaching</option>
+                                <option value="branding">Branding & Marketing</option>
+                                <option value="headshots">Headshot Consultation</option>
+                                <option value="demo">Demo Reel Prep</option>
+                                <option value="agent">Agent/Manager Blitz</option>
+                                <option value="consultation">General Consultation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="message" name="message" rows="5" placeholder="Tell me about your goals..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Kent Kasper</h3>
+                    <p>Hollywood's Premier Acting & Branding Coach</p>
+                    <p class="tagline">"Don't Fight Your Type, Master It!"</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#testimonials">Testimonials</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section
