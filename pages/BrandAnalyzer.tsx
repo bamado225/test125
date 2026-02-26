@@ -198,7 +198,7 @@ const BrandAnalyzer: React.FC = () => {
 
           <div className="text-center mt-12">
             <a
-              href="https://www.tiktok.com/@kentkasper"
+              href="https://www.tiktok.com/@clarkhenny68"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center space-x-3 px-10 py-4 border border-primary text-primary hover:bg-primary hover:text-black font-bold uppercase tracking-widest text-xs transition-all"
