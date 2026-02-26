@@ -22,6 +22,9 @@ const Footer: React.FC = () => {
               <a href="https://www.tiktok.com/@clarkhenny68" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors text-lg">
                 <i className="fab fa-tiktok"></i>
               </a>
+              <a href="https://www.imdb.com/name/nm1408575" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors text-lg">
+                <i className="fab fa-imdb"></i>
+              </a>
             </div>
           </div>
           
