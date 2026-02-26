@@ -277,8 +277,8 @@ const VerticalCoaching: React.FC = () => {
         </div>
       </section>
 
-      {/* ── Pricing ── */}
-      <section className="py-28 bg-white dark:bg-surface-dark border-y dark:border-white/5">
+      {/* ── PRICING ── */}
+      <section className="py-28 bg-slate-50 dark:bg-background-dark">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <p className="text-primary font-bold uppercase tracking-[0.3em] text-[10px] mb-4">Get Started</p>
           <h2 className="font-serif text-4xl md:text-5xl text-slate-900 dark:text-white mb-4">
@@ -288,20 +288,19 @@ const VerticalCoaching: React.FC = () => {
             Everything covered — auditions, technique, platforms, contacts, negotiation — in a single focused session with Kent.
           </p>
 
-          <div className="relative border-2 border-primary bg-slate-50 dark:bg-background-dark p-10 md:p-14 max-w-lg mx-auto">
-            {/* Badge */}
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-6 py-1.5">
+          <div className="relative border-2 border-primary p-10 md:p-14 max-w-lg mx-auto bg-white dark:bg-surface-dark">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-6 py-1.5 whitespace-nowrap">
               <span className="text-black font-bold uppercase tracking-[0.25em] text-[10px]">Micro Mini Drama Coaching</span>
             </div>
 
             <p className="text-primary font-bold uppercase tracking-[0.3em] text-[10px] mb-6 mt-2">Vertical Coaching Session</p>
 
             <div className="flex items-end justify-center gap-2 mb-8">
-              <span className="font-serif text-7xl font-bold text-slate-900 dark:text-white leading-none">$249</span>
-              <span className="text-slate-400 text-sm font-light mb-2">/ session</span>
+              <span className="font-serif text-8xl font-bold text-slate-900 dark:text-white leading-none">$249</span>
+              <span className="text-slate-400 text-base font-light mb-3">/ session</span>
             </div>
 
-            <div className="h-px w-16 bg-primary/30 mx-auto mb-8"></div>
+            <div className="h-px w-16 bg-primary/40 mx-auto mb-8"></div>
 
             <ul className="space-y-4 text-left mb-10 max-w-xs mx-auto">
               {[
@@ -321,7 +320,7 @@ const VerticalCoaching: React.FC = () => {
 
             <Link
               to="/schedule"
-              className="block w-full py-5 bg-primary text-black font-bold uppercase tracking-[0.2em] text-xs hover:bg-primary-hover transition-all shadow-xl shadow-primary/20 text-center"
+              className="block w-full py-5 bg-primary text-black font-bold uppercase tracking-[0.2em] text-xs hover:bg-primary-hover transition-all text-center"
             >
               Book My Session — $249
             </Link>
