@@ -14,7 +14,7 @@ const Home: React.FC = () => {
   const roles = [
     { icon: 'fa-gavel', label: 'The Legal Mind', desc: 'Former NYC Asst. District Attorney who dissects scripts & contracts.' },
     { icon: 'fa-microphone', label: 'The Comedian', desc: 'National headliner for 12+ years. HBO, Showtime, Netflix.' },
-    { icon: 'fa-film', label: 'The Actor', desc: 'SAG-AFTRA. 40+ years. Apollo 13. Mad Men. 200+ national commercials.' },
+    { icon: 'fa-film', label: 'The Actor', desc: 'SAG-AFTRA. 40+ years. Over 40+ guest starring roles, 200+ commercials, and dozens of web series and micro mini-dramas.' },
     { icon: 'fa-book', label: 'The Author', desc: '4 authoritative books on acting, branding & the business of Hollywood.' },
     { icon: 'fa-building', label: 'The Corporate Trainer', desc: 'Commanding presence coaching for Fortune 500 leaders.' },
     { icon: 'fa-brain', label: 'The Life Coach', desc: 'Keeps you sane when the silence is deafening.' },

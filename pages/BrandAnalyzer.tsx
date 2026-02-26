@@ -1,6 +1,5 @@
 
-import React, { useState } from 'react';
-import { GoogleGenAI, Type } from "@google/genai";
+import React from 'react';
 
 const books = [
   {
@@ -33,57 +32,24 @@ const books = [
   },
 ];
 
-// Placeholder podcast episodes — replace src with real embed URLs
 const podcasts = [
-  { title: "Podcast Episode 1", src: "" },
-  { title: "Podcast Episode 2", src: "" },
-  { title: "Podcast Episode 3", src: "" },
+  { title: "Kent Kasper — Interview", src: "https://www.youtube.com/embed/CRfGaFZxiDE", link: "" },
+  { title: "Kent Kasper — Interview", src: "https://www.youtube.com/embed/gRa7QvtGueY", link: "" },
+  { title: "Kent Kasper — Interview", src: "https://www.youtube.com/embed/qdBW7aNpMyQ", link: "" },
+  { title: "CooperTalk — Episode 391", src: "", link: "https://www.coopertalk.net/e/kent-kasper-episode-391/" },
 ];
 
-// Placeholder TikTok videos — replace src with real TikTok embed URLs
 const tiktoks = [
-  { title: "TikTok Video 1", src: "" },
-  { title: "TikTok Video 2", src: "" },
-  { title: "TikTok Video 3", src: "" },
+  { title: "TikTok Video 1", src: "https://www.tiktok.com/embed/v2/7488580691462999326?autoplay=0" },
+  { title: "TikTok Video 2", src: "https://www.tiktok.com/embed/v2/7487723518986079519?autoplay=0" },
+  { title: "TikTok Video 3", src: "https://www.tiktok.com/embed/v2/7486721902040337695?autoplay=0" },
+  { title: "TikTok Video 4", src: "https://www.tiktok.com/embed/v2/7485953002998664494?autoplay=0" },
+  { title: "TikTok Video 5", src: "https://www.tiktok.com/embed/v2/7484902502563990826?autoplay=0" },
+  { title: "TikTok Video 6", src: "https://www.tiktok.com/embed/v2/7484203172559408427?autoplay=0" },
+  { title: "TikTok Video 7", src: "https://www.tiktok.com/embed/v2/7483509118536338731?autoplay=0" },
 ];
 
 const BrandAnalyzer: React.FC = () => {
-  const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
-
-  const analyzeBrand = async () => {
-    if (!description) return;
-    setLoading(true);
-    try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `Analyze the following actor description and provide a brand strategy: "${description}"`,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              marketType: { type: Type.STRING, description: "The actor's primary 'type' or archetype." },
-              tagline: { type: Type.STRING, description: "A catchy branding tagline." },
-              strengths: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Key branding strengths." },
-              opportunities: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Marketing opportunities." }
-            },
-            required: ["marketType", "tagline", "strengths", "opportunities"]
-          }
-        }
-      });
-      const data = JSON.parse(response.text);
-      setResult(data);
-    } catch (error) {
-      console.error("AI Analysis failed:", error);
-      alert("Something went wrong with the AI analysis. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="bg-slate-50 dark:bg-background-dark min-h-screen">
 
@@ -156,26 +122,37 @@ const BrandAnalyzer: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {podcasts.map((pod, i) => (
-              <div key={i} className="bg-slate-50 dark:bg-black/20 border dark:border-white/5 rounded-lg overflow-hidden">
+              <div key={i} className="bg-slate-50 dark:bg-black/20 border dark:border-white/5 rounded-lg overflow-hidden flex flex-col">
                 {pod.src ? (
                   <iframe
                     src={pod.src}
                     title={pod.title}
-                    className="w-full h-40"
+                    className="w-full aspect-video"
                     frameBorder="0"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
                     loading="lazy"
                   />
                 ) : (
-                  <div className="h-40 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 space-y-3">
+                  <div className="aspect-video flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 space-y-3 bg-slate-100 dark:bg-black/30">
                     <i className="fas fa-microphone text-3xl text-primary/30"></i>
-                    <span className="text-[10px] uppercase tracking-widest font-bold">Coming Soon</span>
                   </div>
                 )}
-                <div className="p-4">
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{pod.title}</p>
+                <div className="p-4 flex flex-col flex-grow">
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-3">{pod.title}</p>
+                  {pod.link && (
+                    <a
+                      href={pod.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-auto inline-flex items-center justify-center gap-2 w-full py-2.5 bg-primary text-black font-bold uppercase tracking-widest text-[10px] hover:bg-primary-hover transition-all"
+                    >
+                      <i className="fas fa-headphones"></i>
+                      <span>Listen Now</span>
+                    </a>
+                  )}
                 </div>
               </div>
             ))}
@@ -229,84 +206,6 @@ const BrandAnalyzer: React.FC = () => {
               <i className="fab fa-tiktok"></i>
               <span>Follow on TikTok</span>
             </a>
-          </div>
-        </div>
-      </section>
-
-      {/* ── AI Brand Analyzer ── */}
-      <section className="py-24 bg-white dark:bg-surface-dark border-t dark:border-white/5">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <p className="text-primary font-bold uppercase tracking-[0.3em] text-[10px] mb-4">Powered by AI</p>
-            <h2 className="font-serif text-4xl md:text-5xl text-slate-900 dark:text-white mb-6">Your Brand, Analyzed</h2>
-            <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto font-light leading-relaxed">
-              Use the same branding framework Kent teaches in his coaching sessions. Describe yourself as an actor and get an instant AI-powered archetype assessment — your type, your tagline, your strategy.
-            </p>
-          </div>
-
-          <div className="bg-slate-50 dark:bg-surface-dark p-8 md:p-12 shadow-2xl border dark:border-white/5 rounded-lg">
-            <div className="mb-10">
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Describe Your Essence</label>
-              <textarea
-                rows={5}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-white dark:bg-black/20 border-transparent focus:ring-primary focus:border-primary dark:text-white text-base py-6 px-6 resize-none rounded"
-                placeholder="Example: Mid-30s, intense eyes, sharp features. Naturally fits 'young tech CEO' or 'determined detective' archetypes. Performance style is subtle and internal."
-              />
-            </div>
-
-            <button
-              onClick={analyzeBrand}
-              disabled={loading || !description}
-              className="w-full bg-primary text-black font-bold uppercase tracking-[0.2em] text-xs py-6 hover:bg-primary-hover transition-all shadow-xl shadow-primary/20 disabled:opacity-50 flex items-center justify-center space-x-3"
-            >
-              {loading ? (
-                <>
-                  <i className="fas fa-circle-notch fa-spin"></i>
-                  <span>Analyzing Your Brand...</span>
-                </>
-              ) : (
-                <>
-                  <i className="fas fa-wand-magic-sparkles"></i>
-                  <span>Generate My Brand Strategy</span>
-                </>
-              )}
-            </button>
-
-            {result && (
-              <div className="mt-16 animate-fade-in-up">
-                <div className="p-8 border-2 border-primary/20 bg-primary/5 rounded-lg mb-10">
-                  <span className="text-primary font-bold uppercase tracking-[0.3em] text-[9px] mb-2 block">Your Archetype</span>
-                  <h3 className="font-serif text-3xl text-slate-900 dark:text-white mb-2">{result.marketType}</h3>
-                  <p className="text-primary italic font-serif text-xl">"{result.tagline}"</p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  <div>
-                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-primary/20 pb-2">Core Strengths</h4>
-                    <ul className="space-y-4">
-                      {result.strengths.map((s: string, i: number) => (
-                        <li key={i} className="flex items-center space-x-3 text-sm text-slate-700 dark:text-slate-300">
-                          <i className="fas fa-check text-primary/60 text-xs"></i>
-                          <span>{s}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-primary/20 pb-2">Market Opportunities</h4>
-                    <ul className="space-y-4">
-                      {result.opportunities.map((o: string, i: number) => (
-                        <li key={i} className="flex items-center space-x-3 text-sm text-slate-700 dark:text-slate-300">
-                          <i className="fas fa-lightbulb text-primary/60 text-xs"></i>
-                          <span>{o}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </section>
