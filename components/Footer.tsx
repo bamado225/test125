@@ -57,7 +57,7 @@ const Footer: React.FC = () => {
         </div>
         
         <div className="border-t border-gray-100 dark:border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] uppercase tracking-[0.2em] text-slate-400">
-          <p>© 2025 Kent Kasper Coaching. All rights reserved.</p>
+          <p><Link to="/admin-kk-testimonials-2025" className="opacity-0 select-none cursor-default">©</Link> 2025 Kent Kasper Coaching. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
