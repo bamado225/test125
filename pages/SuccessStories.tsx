@@ -1,6 +1,17 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Testimonial } from '../types';
+
+const SECRET_KEY = 'kk_testimonials_v1';
+
+interface StoredTestimonial {
+  id: string;
+  author: string;
+  role: string;
+  quote: string;
+  avatarUrl: string;
+  socialLink?: string;
+}
 
 const testimonials: Testimonial[] = [
   // ── Original 12 ──────────────────────────────────────────────────────────
@@ -178,6 +189,25 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => (
 );
 
 const SuccessStories: React.FC = () => {
+  const [added, setAdded] = useState<StoredTestimonial[]>([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(SECRET_KEY);
+    if (stored) setAdded(JSON.parse(stored));
+  }, []);
+
+  const allTestimonials = [
+    ...added.map(t => ({
+      author: t.author,
+      role: t.role,
+      quote: t.quote,
+      avatarUrl: t.avatarUrl,
+      socialLink: t.socialLink,
+      rating: 5,
+    })),
+    ...testimonials,
+  ];
+
   return (
     <div className="pt-32 pb-24 bg-slate-50 dark:bg-background-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -211,7 +241,7 @@ const SuccessStories: React.FC = () => {
 
         {/* Testimonials Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {testimonials.map((t, idx) => (
+          {allTestimonials.map((t, idx) => (
             <div
               key={idx}
               className="group bg-white dark:bg-surface-dark border border-gray-100 dark:border-white/5 p-8 relative flex flex-col hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300"
@@ -232,15 +262,28 @@ const SuccessStories: React.FC = () => {
 
               {/* Author */}
               <div className="flex items-center gap-4">
-                <img
-                  src={t.avatarUrl}
-                  alt={t.author}
-                  className="w-11 h-11 rounded-full object-cover grayscale flex-shrink-0"
-                />
+                {t.avatarUrl ? (
+                  <img
+                    src={t.avatarUrl}
+                    alt={t.author}
+                    className="w-11 h-11 rounded-full object-cover grayscale flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-11 h-11 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
+                    <i className="fas fa-user text-slate-400"></i>
+                  </div>
+                )}
                 <div className="min-w-0">
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider truncate">
-                    {t.author}
-                  </h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider truncate">
+                      {t.author}
+                    </h4>
+                    {t.socialLink && (
+                      <a href={t.socialLink} target="_blank" rel="noopener noreferrer" className="text-primary/50 hover:text-primary transition-colors flex-shrink-0">
+                        <i className="fas fa-link text-[10px]"></i>
+                      </a>
+                    )}
+                  </div>
                   <p className="text-[10px] text-primary/70 uppercase tracking-widest truncate mt-0.5">
                     {t.role}
                   </p>

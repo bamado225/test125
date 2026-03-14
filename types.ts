@@ -18,4 +18,5 @@ export interface Testimonial {
   role: string;
   avatarUrl: string;
   rating?: number;
+  socialLink?: string;
 }
