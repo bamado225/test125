@@ -9,6 +9,7 @@ import SuccessStories from './pages/SuccessStories';
 import BrandAnalyzer from './pages/BrandAnalyzer';
 import VerticalCoaching from './pages/VerticalCoaching';
 import AdminTestimonials from './pages/AdminTestimonials';
+import Packages from './pages/Packages';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -41,6 +42,7 @@ const App: React.FC = () => {
             <Route path="/success-stories" element={<SuccessStories />} />
             <Route path="/brand-analyzer" element={<BrandAnalyzer />} />
             <Route path="/vertical-coaching" element={<VerticalCoaching />} />
+            <Route path="/packages" element={<Packages />} />
             <Route path="/admin-kk-testimonials-2025" element={<AdminTestimonials />} />
           </Routes>
         </main>
