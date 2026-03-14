@@ -14,50 +14,89 @@ interface StoredTestimonial {
   createdAt: string;
 }
 
+const readFile = (file: File, setter: (v: string) => void) => {
+  const reader = new FileReader();
+  reader.onload = () => setter(reader.result as string);
+  reader.readAsDataURL(file);
+};
+
 const ImageUpload: React.FC<{
   label: string;
   hint?: string;
   preview: string;
-  onFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onImage: (v: string) => void;
   onRemove: () => void;
   inputRef: React.RefObject<HTMLInputElement>;
   square?: boolean;
-}> = ({ label, hint, preview, onFile, onRemove, inputRef, square }) => (
-  <div>
-    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400 mb-2">
-      {label} {hint && <span className="text-slate-400 font-normal normal-case tracking-normal">{hint}</span>}
-    </label>
-    <div className="flex items-start gap-5">
-      {preview ? (
-        square
-          ? <img src={preview} alt="Preview" className="w-24 h-24 object-cover border border-primary flex-shrink-0" />
-          : <img src={preview} alt="Preview" className="w-16 h-16 rounded-full object-cover grayscale border-2 border-primary flex-shrink-0" />
-      ) : (
-        <div className={`${square ? 'w-24 h-24' : 'w-16 h-16 rounded-full'} bg-slate-200 dark:bg-white/5 flex items-center justify-center flex-shrink-0`}>
-          <i className={`fas ${square ? 'fa-image' : 'fa-user'} text-slate-400 text-xl`}></i>
-        </div>
-      )}
-      <div className="flex-1">
+}> = ({ label, hint, preview, onImage, onRemove, inputRef, square }) => {
+  const [dragging, setDragging] = useState(false);
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) readFile(file, onImage);
+  };
+
+  return (
+    <div>
+      <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400 mb-2">
+        {label} {hint && <span className="text-slate-400 font-normal normal-case tracking-normal">{hint}</span>}
+      </label>
+
+      <div
+        onDragOver={e => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={handleDrop}
+        onClick={() => inputRef.current?.click()}
+        className={`relative cursor-pointer border-2 border-dashed transition-colors p-6 flex flex-col items-center justify-center gap-3 ${
+          dragging
+            ? 'border-primary bg-primary/5'
+            : preview
+            ? 'border-primary/40 dark:border-primary/30'
+            : 'border-slate-300 dark:border-white/10 hover:border-primary/60'
+        }`}
+      >
         <input
           ref={inputRef}
           type="file"
           accept="image/*"
-          onChange={onFile}
-          className="block w-full text-sm text-slate-500 dark:text-slate-400
-            file:mr-4 file:py-2 file:px-5
-            file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest
-            file:bg-primary file:text-black
-            hover:file:bg-primary/80 file:cursor-pointer file:transition-colors"
+          className="hidden"
+          onChange={e => { const f = e.target.files?.[0]; if (f) readFile(f, onImage); }}
         />
-        {preview && (
-          <button type="button" onClick={onRemove} className="mt-2 text-[10px] text-slate-400 hover:text-red-400 uppercase tracking-widest transition-colors">
-            Remove
-          </button>
+
+        {preview ? (
+          <div className="flex flex-col items-center gap-3 w-full">
+            {square ? (
+              <img src={preview} alt="Preview" className="max-h-48 object-contain border dark:border-white/10" />
+            ) : (
+              <img src={preview} alt="Preview" className="w-20 h-20 rounded-full object-cover grayscale border-2 border-primary" />
+            )}
+            <p className="text-[10px] text-slate-400 uppercase tracking-widest">Drop a new image to replace</p>
+          </div>
+        ) : (
+          <>
+            <i className={`fas ${square ? 'fa-image' : 'fa-user-circle'} text-3xl text-slate-300 dark:text-white/20`}></i>
+            <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
+              <span className="font-bold text-primary">Click to upload</span> or drag & drop
+            </p>
+            <p className="text-[10px] text-slate-400 uppercase tracking-widest">PNG, JPG, WEBP</p>
+          </>
         )}
       </div>
+
+      {preview && (
+        <button
+          type="button"
+          onClick={e => { e.stopPropagation(); onRemove(); if (inputRef.current) inputRef.current.value = ''; }}
+          className="mt-2 text-[10px] text-slate-400 hover:text-red-400 uppercase tracking-widest transition-colors"
+        >
+          Remove
+        </button>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 const AdminTestimonials: React.FC = () => {
   const [testimonials, setTestimonials] = useState<StoredTestimonial[]>([]);
@@ -79,13 +118,6 @@ const AdminTestimonials: React.FC = () => {
     setTestimonials(list);
   };
 
-  const makeImageHandler = (setter: (v: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setter(reader.result as string);
-    reader.readAsDataURL(file);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,7 +210,7 @@ const AdminTestimonials: React.FC = () => {
             label="Avatar Photo"
             hint="(optional)"
             preview={avatarPreview}
-            onFile={makeImageHandler(setAvatarPreview)}
+            onImage={setAvatarPreview}
             onRemove={() => { setAvatarPreview(''); if (avatarRef.current) avatarRef.current.value = ''; }}
             inputRef={avatarRef}
           />
@@ -189,16 +221,11 @@ const AdminTestimonials: React.FC = () => {
               label="Social Media / IMDB Screenshot"
               hint="(optional)"
               preview={screenshotPreview}
-              onFile={makeImageHandler(setScreenshotPreview)}
+              onImage={setScreenshotPreview}
               onRemove={() => { setScreenshotPreview(''); if (screenshotRef.current) screenshotRef.current.value = ''; }}
               inputRef={screenshotRef}
               square
             />
-            {screenshotPreview && (
-              <div className="mt-4 border dark:border-white/10 p-2 inline-block">
-                <img src={screenshotPreview} alt="Screenshot preview" className="max-h-48 object-contain" />
-              </div>
-            )}
           </div>
 
           <div>
