@@ -10,6 +10,7 @@ interface StoredTestimonial {
   role: string;
   quote: string;
   avatarUrl: string;
+  screenshotUrl?: string;
   socialLink?: string;
 }
 
@@ -202,6 +203,7 @@ const SuccessStories: React.FC = () => {
       role: t.role,
       quote: t.quote,
       avatarUrl: t.avatarUrl,
+      screenshotUrl: t.screenshotUrl,
       socialLink: t.socialLink,
       rating: 5,
     })),
@@ -256,6 +258,17 @@ const SuccessStories: React.FC = () => {
               <p className="text-slate-600 dark:text-slate-300 text-sm italic leading-relaxed flex-grow pr-8">
                 "{t.quote}"
               </p>
+
+              {/* Screenshot */}
+              {t.screenshotUrl && (
+                <div className="mt-4 mb-2">
+                  <img
+                    src={t.screenshotUrl}
+                    alt="Social media testimonial"
+                    className="w-full rounded object-contain border dark:border-white/5 max-h-48"
+                  />
+                </div>
+              )}
 
               {/* Divider */}
               <div className="h-px w-12 bg-primary/20 my-6"></div>

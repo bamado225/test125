@@ -9,17 +9,65 @@ interface StoredTestimonial {
   role: string;
   quote: string;
   avatarUrl: string;
+  screenshotUrl?: string;
   socialLink?: string;
   createdAt: string;
 }
+
+const ImageUpload: React.FC<{
+  label: string;
+  hint?: string;
+  preview: string;
+  onFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onRemove: () => void;
+  inputRef: React.RefObject<HTMLInputElement>;
+  square?: boolean;
+}> = ({ label, hint, preview, onFile, onRemove, inputRef, square }) => (
+  <div>
+    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400 mb-2">
+      {label} {hint && <span className="text-slate-400 font-normal normal-case tracking-normal">{hint}</span>}
+    </label>
+    <div className="flex items-start gap-5">
+      {preview ? (
+        square
+          ? <img src={preview} alt="Preview" className="w-24 h-24 object-cover border border-primary flex-shrink-0" />
+          : <img src={preview} alt="Preview" className="w-16 h-16 rounded-full object-cover grayscale border-2 border-primary flex-shrink-0" />
+      ) : (
+        <div className={`${square ? 'w-24 h-24' : 'w-16 h-16 rounded-full'} bg-slate-200 dark:bg-white/5 flex items-center justify-center flex-shrink-0`}>
+          <i className={`fas ${square ? 'fa-image' : 'fa-user'} text-slate-400 text-xl`}></i>
+        </div>
+      )}
+      <div className="flex-1">
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          onChange={onFile}
+          className="block w-full text-sm text-slate-500 dark:text-slate-400
+            file:mr-4 file:py-2 file:px-5
+            file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest
+            file:bg-primary file:text-black
+            hover:file:bg-primary/80 file:cursor-pointer file:transition-colors"
+        />
+        {preview && (
+          <button type="button" onClick={onRemove} className="mt-2 text-[10px] text-slate-400 hover:text-red-400 uppercase tracking-widest transition-colors">
+            Remove
+          </button>
+        )}
+      </div>
+    </div>
+  </div>
+);
 
 const AdminTestimonials: React.FC = () => {
   const [testimonials, setTestimonials] = useState<StoredTestimonial[]>([]);
   const [form, setForm] = useState({ author: '', role: '', quote: '', socialLink: '' });
   const [avatarPreview, setAvatarPreview] = useState<string>('');
+  const [screenshotPreview, setScreenshotPreview] = useState<string>('');
   const [saved, setSaved] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const avatarRef = useRef<HTMLInputElement>(null);
+  const screenshotRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem(SECRET_KEY);
@@ -31,11 +79,11 @@ const AdminTestimonials: React.FC = () => {
     setTestimonials(list);
   };
 
-  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const makeImageHandler = (setter: (v: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => setAvatarPreview(reader.result as string);
+    reader.onload = () => setter(reader.result as string);
     reader.readAsDataURL(file);
   };
 
@@ -49,6 +97,7 @@ const AdminTestimonials: React.FC = () => {
       role: form.role,
       quote: form.quote,
       avatarUrl: avatarPreview,
+      screenshotUrl: screenshotPreview || undefined,
       socialLink: form.socialLink || undefined,
       createdAt: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
     };
@@ -56,7 +105,9 @@ const AdminTestimonials: React.FC = () => {
     persist([entry, ...testimonials]);
     setForm({ author: '', role: '', quote: '', socialLink: '' });
     setAvatarPreview('');
-    if (fileRef.current) fileRef.current.value = '';
+    setScreenshotPreview('');
+    if (avatarRef.current) avatarRef.current.value = '';
+    if (screenshotRef.current) screenshotRef.current.value = '';
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
@@ -122,37 +173,32 @@ const AdminTestimonials: React.FC = () => {
             />
           </div>
 
-          <div>
-            <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400 mb-2">
-              Photo
-            </label>
-            <div className="flex items-center gap-5">
-              {avatarPreview ? (
-                <img src={avatarPreview} alt="Preview" className="w-16 h-16 rounded-full object-cover grayscale border-2 border-primary flex-shrink-0" />
-              ) : (
-                <div className="w-16 h-16 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
-                  <i className="fas fa-user text-slate-400 text-xl"></i>
-                </div>
-              )}
-              <div className="flex-1">
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImage}
-                  className="block w-full text-sm text-slate-500 dark:text-slate-400
-                    file:mr-4 file:py-2 file:px-5
-                    file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest
-                    file:bg-primary file:text-black
-                    hover:file:bg-primary/80 file:cursor-pointer file:transition-colors"
-                />
-                {avatarPreview && (
-                  <button type="button" onClick={() => { setAvatarPreview(''); if (fileRef.current) fileRef.current.value = ''; }} className="mt-2 text-[10px] text-slate-400 hover:text-red-400 uppercase tracking-widest transition-colors">
-                    Remove photo
-                  </button>
-                )}
+          {/* Avatar */}
+          <ImageUpload
+            label="Avatar Photo"
+            hint="(optional)"
+            preview={avatarPreview}
+            onFile={makeImageHandler(setAvatarPreview)}
+            onRemove={() => { setAvatarPreview(''); if (avatarRef.current) avatarRef.current.value = ''; }}
+            inputRef={avatarRef}
+          />
+
+          {/* Screenshot */}
+          <div className="border-t dark:border-white/5 pt-6">
+            <ImageUpload
+              label="Social Media / IMDB Screenshot"
+              hint="(optional)"
+              preview={screenshotPreview}
+              onFile={makeImageHandler(setScreenshotPreview)}
+              onRemove={() => { setScreenshotPreview(''); if (screenshotRef.current) screenshotRef.current.value = ''; }}
+              inputRef={screenshotRef}
+              square
+            />
+            {screenshotPreview && (
+              <div className="mt-4 border dark:border-white/10 p-2 inline-block">
+                <img src={screenshotPreview} alt="Screenshot preview" className="max-h-48 object-contain" />
               </div>
-            </div>
+            )}
           </div>
 
           <div>
@@ -204,6 +250,11 @@ const AdminTestimonials: React.FC = () => {
                       <div>
                         <p className="font-bold text-slate-900 dark:text-white text-sm">{t.author}</p>
                         {t.role && <p className="text-primary text-[10px] uppercase tracking-widest mt-0.5">{t.role}</p>}
+                        {t.screenshotUrl && (
+                          <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-slate-400 uppercase tracking-widest">
+                            <i className="fas fa-image text-primary/60"></i> Screenshot attached
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
                         {t.socialLink && (
