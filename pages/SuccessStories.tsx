@@ -47,6 +47,7 @@ const QuoteText: React.FC<{ quote: string }> = ({ quote }) => {
 const SuccessStories: React.FC = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
+  const [highlighted, setHighlighted] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
@@ -58,6 +59,15 @@ const SuccessStories: React.FC = () => {
         setLoading(false);
       });
   }, []);
+
+  const scrollToTestimonial = (id: string) => {
+    const el = document.getElementById(`testimonial-${id}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setHighlighted(id);
+      setTimeout(() => setHighlighted(null), 2000);
+    }
+  };
 
   return (
     <div className="pt-32 pb-24 bg-slate-50 dark:bg-background-dark">
@@ -83,7 +93,11 @@ const SuccessStories: React.FC = () => {
               {testimonials
                 .filter(t => t.avatar_url || t.screenshot_url)
                 .map(t => (
-                  <div key={t.id} className="break-inside-avoid overflow-hidden group relative">
+                  <div
+                    key={t.id}
+                    onClick={() => scrollToTestimonial(t.id)}
+                    className="break-inside-avoid overflow-hidden group relative cursor-pointer"
+                  >
                     <img
                       src={t.screenshot_url || t.avatar_url}
                       alt={t.author}
@@ -113,7 +127,12 @@ const SuccessStories: React.FC = () => {
             {testimonials.map((t) => (
               <div
                 key={t.id}
-                className="group bg-white dark:bg-surface-dark border border-gray-100 dark:border-white/5 p-8 relative flex flex-col hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300"
+                id={`testimonial-${t.id}`}
+                className={`group bg-white dark:bg-surface-dark border p-8 relative flex flex-col hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 ${
+                  highlighted === t.id
+                    ? 'border-primary shadow-2xl shadow-primary/20'
+                    : 'border-gray-100 dark:border-white/5'
+                }`}
               >
                 <i className="fas fa-quote-left text-primary/10 dark:text-primary/10 text-4xl absolute top-6 right-6 pointer-events-none select-none"></i>
 
