@@ -97,9 +97,14 @@ const ImageUpload: React.FC<{
   );
 };
 
+const ADMIN_PASSWORD = 'Emom78#$$%';
+
 const emptyForm = { author: '', role: '', quote: '', socialLink: '' };
 
 const AdminTestimonials: React.FC = () => {
+  const [unlocked, setUnlocked] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
   const [testimonials, setTestimonials] = useState<StoredTestimonial[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
@@ -182,6 +187,49 @@ const AdminTestimonials: React.FC = () => {
     if (editId === id) resetForm();
     fetchTestimonials();
   };
+
+  if (!unlocked) {
+    return (
+      <div className="pt-32 pb-24 min-h-screen bg-slate-100 dark:bg-background-dark flex items-center justify-center">
+        <div className="w-full max-w-sm mx-auto px-4">
+          <div className="bg-white dark:bg-surface-dark border dark:border-white/5 p-10">
+            <p className="text-primary font-bold uppercase tracking-[0.3em] text-[10px] mb-2">Admin Panel</p>
+            <h1 className="font-serif text-3xl text-slate-900 dark:text-white mb-8">Enter Password</h1>
+            <form onSubmit={e => {
+              e.preventDefault();
+              if (passwordInput === ADMIN_PASSWORD) {
+                setUnlocked(true);
+                setPasswordError(false);
+              } else {
+                setPasswordError(true);
+                setPasswordInput('');
+              }
+            }} className="space-y-4">
+              <input
+                type="password"
+                value={passwordInput}
+                onChange={e => { setPasswordInput(e.target.value); setPasswordError(false); }}
+                autoFocus
+                placeholder="Password"
+                className={`w-full bg-slate-50 dark:bg-background-dark border px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none transition-colors ${
+                  passwordError ? 'border-red-400' : 'dark:border-white/10 focus:border-primary'
+                }`}
+              />
+              {passwordError && (
+                <p className="text-red-400 text-xs uppercase tracking-widest">Incorrect password</p>
+              )}
+              <button
+                type="submit"
+                className="w-full py-4 bg-primary text-black font-bold uppercase tracking-[0.2em] text-xs hover:bg-primary/80 transition-all"
+              >
+                Enter
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-24 pb-20 min-h-screen bg-slate-100 dark:bg-background-dark">
