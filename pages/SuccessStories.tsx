@@ -22,6 +22,30 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => (
   </div>
 );
 
+const WORD_LIMIT = 50;
+
+const truncate = (text: string) => text.split(' ').slice(0, WORD_LIMIT).join(' ') + '…';
+
+const QuoteText: React.FC<{ quote: string }> = ({ quote }) => {
+  const [expanded, setExpanded] = useState(false);
+  const isLong = quote.split(' ').length > WORD_LIMIT;
+  return (
+    <div className="flex-grow pr-8">
+      <p className="text-slate-600 dark:text-slate-300 text-sm italic leading-relaxed">
+        "{expanded || !isLong ? quote : truncate(quote)}"
+      </p>
+      {isLong && (
+        <button
+          onClick={() => setExpanded(e => !e)}
+          className="mt-2 text-primary text-[10px] font-bold uppercase tracking-widest hover:text-primary/70 transition-colors"
+        >
+          {expanded ? 'Show less' : 'Read more'}
+        </button>
+      )}
+    </div>
+  );
+};
+
 const SuccessStories: React.FC = () => {
   const [added, setAdded] = useState<StoredTestimonial[]>([]);
 
@@ -85,9 +109,7 @@ const SuccessStories: React.FC = () => {
               <StarRating rating={t.rating ?? 5} />
 
               {/* Quote */}
-              <p className="text-slate-600 dark:text-slate-300 text-sm italic leading-relaxed flex-grow pr-8">
-                "{t.quote}"
-              </p>
+              <QuoteText quote={t.quote} />
 
               {/* Screenshot */}
               {t.screenshotUrl && (
