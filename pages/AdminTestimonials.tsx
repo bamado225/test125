@@ -1,17 +1,16 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-
-const SECRET_KEY = 'kk_testimonials_v1';
+import { supabase } from '../lib/supabase';
 
 interface StoredTestimonial {
   id: string;
   author: string;
   role: string;
   quote: string;
-  avatarUrl: string;
-  screenshotUrl?: string;
-  socialLink?: string;
-  createdAt: string;
+  avatar_url: string;
+  screenshot_url?: string;
+  social_link?: string;
+  created_at: string;
 }
 
 const readFile = (file: File, setter: (v: string) => void) => {
@@ -104,49 +103,60 @@ const AdminTestimonials: React.FC = () => {
   const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [screenshotPreview, setScreenshotPreview] = useState<string>('');
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const avatarRef = useRef<HTMLInputElement>(null);
   const screenshotRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const stored = localStorage.getItem(SECRET_KEY);
-    if (stored) setTestimonials(JSON.parse(stored));
-  }, []);
-
-  const persist = (list: StoredTestimonial[]) => {
-    localStorage.setItem(SECRET_KEY, JSON.stringify(list));
-    setTestimonials(list);
+  const fetchTestimonials = async () => {
+    const { data, error } = await supabase
+      .from('testimonials')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (!error && data) setTestimonials(data);
+    setLoading(false);
   };
 
+  useEffect(() => {
+    fetchTestimonials();
+  }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.author || !form.quote) return;
+    setSaving(true);
+    setError(null);
 
-    const entry: StoredTestimonial = {
-      id: Date.now().toString(),
+    const { error } = await supabase.from('testimonials').insert({
       author: form.author,
       role: form.role,
       quote: form.quote,
-      avatarUrl: avatarPreview,
-      screenshotUrl: screenshotPreview || undefined,
-      socialLink: form.socialLink || undefined,
-      createdAt: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-    };
+      avatar_url: avatarPreview || null,
+      screenshot_url: screenshotPreview || null,
+      social_link: form.socialLink || null,
+    });
 
-    persist([entry, ...testimonials]);
-    setForm({ author: '', role: '', quote: '', socialLink: '' });
-    setAvatarPreview('');
-    setScreenshotPreview('');
-    if (avatarRef.current) avatarRef.current.value = '';
-    if (screenshotRef.current) screenshotRef.current.value = '';
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    if (error) {
+      setError(error.message);
+    } else {
+      setForm({ author: '', role: '', quote: '', socialLink: '' });
+      setAvatarPreview('');
+      setScreenshotPreview('');
+      if (avatarRef.current) avatarRef.current.value = '';
+      if (screenshotRef.current) screenshotRef.current.value = '';
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+      fetchTestimonials();
+    }
+    setSaving(false);
   };
 
-  const handleDelete = (id: string) => {
-    persist(testimonials.filter(t => t.id !== id));
+  const handleDelete = async (id: string) => {
+    await supabase.from('testimonials').delete().eq('id', id);
     setDeleteId(null);
+    fetchTestimonials();
   };
 
   return (
@@ -157,7 +167,7 @@ const AdminTestimonials: React.FC = () => {
         <div className="mb-10">
           <p className="text-primary font-bold uppercase tracking-[0.3em] text-[10px] mb-2">Admin Panel</p>
           <h1 className="font-serif text-4xl text-slate-900 dark:text-white">Add Testimonial</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">Testimonials added here appear on the Success Stories page.</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">Testimonials saved here appear instantly on the Success Stories page on all devices.</p>
         </div>
 
         {/* Form */}
@@ -241,12 +251,17 @@ const AdminTestimonials: React.FC = () => {
             />
           </div>
 
+          {error && (
+            <p className="text-red-400 text-xs uppercase tracking-widest">{error}</p>
+          )}
+
           <div className="flex items-center gap-4 pt-2">
             <button
               type="submit"
-              className="px-10 py-4 bg-primary text-black font-bold uppercase tracking-[0.2em] text-xs hover:bg-primary/80 transition-all"
+              disabled={saving}
+              className="px-10 py-4 bg-primary text-black font-bold uppercase tracking-[0.2em] text-xs hover:bg-primary/80 transition-all disabled:opacity-50"
             >
-              Add Testimonial
+              {saving ? 'Saving…' : 'Add Testimonial'}
             </button>
             {saved && (
               <span className="text-primary text-xs font-bold uppercase tracking-widest flex items-center gap-2">
@@ -257,7 +272,11 @@ const AdminTestimonials: React.FC = () => {
         </form>
 
         {/* Saved testimonials list */}
-        {testimonials.length > 0 && (
+        {loading ? (
+          <div className="text-center py-16 text-slate-400">
+            <p className="text-sm uppercase tracking-widest">Loading…</p>
+          </div>
+        ) : testimonials.length > 0 ? (
           <div>
             <h2 className="font-serif text-2xl text-slate-900 dark:text-white mb-6">
               Saved Testimonials <span className="text-primary">({testimonials.length})</span>
@@ -265,8 +284,8 @@ const AdminTestimonials: React.FC = () => {
             <div className="space-y-4">
               {testimonials.map(t => (
                 <div key={t.id} className="bg-white dark:bg-surface-dark border dark:border-white/5 p-6 flex items-start gap-5">
-                  {t.avatarUrl ? (
-                    <img src={t.avatarUrl} alt={t.author} className="w-12 h-12 rounded-full object-cover grayscale flex-shrink-0" />
+                  {t.avatar_url ? (
+                    <img src={t.avatar_url} alt={t.author} className="w-12 h-12 rounded-full object-cover grayscale flex-shrink-0" />
                   ) : (
                     <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
                       <i className="fas fa-user text-slate-400"></i>
@@ -277,15 +296,15 @@ const AdminTestimonials: React.FC = () => {
                       <div>
                         <p className="font-bold text-slate-900 dark:text-white text-sm">{t.author}</p>
                         {t.role && <p className="text-primary text-[10px] uppercase tracking-widest mt-0.5">{t.role}</p>}
-                        {t.screenshotUrl && (
+                        {t.screenshot_url && (
                           <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-slate-400 uppercase tracking-widest">
                             <i className="fas fa-image text-primary/60"></i> Screenshot attached
                           </span>
                         )}
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
-                        {t.socialLink && (
-                          <a href={t.socialLink} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors text-xs">
+                        {t.social_link && (
+                          <a href={t.social_link} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors text-xs">
                             <i className="fas fa-link"></i>
                           </a>
                         )}
@@ -302,15 +321,13 @@ const AdminTestimonials: React.FC = () => {
                       </div>
                     </div>
                     <p className="text-slate-500 dark:text-slate-400 text-sm italic mt-3 leading-relaxed line-clamp-2">"{t.quote}"</p>
-                    <p className="text-slate-300 dark:text-slate-600 text-[10px] mt-2">{t.createdAt}</p>
+                    <p className="text-slate-300 dark:text-slate-600 text-[10px] mt-2">{t.created_at?.split('T')[0]}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        )}
-
-        {testimonials.length === 0 && (
+        ) : (
           <div className="text-center py-16 text-slate-400">
             <i className="fas fa-quote-left text-3xl mb-4 block opacity-30"></i>
             <p className="text-sm uppercase tracking-widest">No testimonials added yet</p>
