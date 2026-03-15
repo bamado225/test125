@@ -97,18 +97,22 @@ const ImageUpload: React.FC<{
   );
 };
 
+const emptyForm = { author: '', role: '', quote: '', socialLink: '' };
+
 const AdminTestimonials: React.FC = () => {
   const [testimonials, setTestimonials] = useState<StoredTestimonial[]>([]);
-  const [form, setForm] = useState({ author: '', role: '', quote: '', socialLink: '' });
+  const [form, setForm] = useState(emptyForm);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [screenshotPreview, setScreenshotPreview] = useState<string>('');
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const avatarRef = useRef<HTMLInputElement>(null);
   const screenshotRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const fetchTestimonials = async () => {
     const { data, error } = await supabase
@@ -123,29 +127,48 @@ const AdminTestimonials: React.FC = () => {
     fetchTestimonials();
   }, []);
 
+  const resetForm = () => {
+    setForm(emptyForm);
+    setAvatarPreview('');
+    setScreenshotPreview('');
+    setEditId(null);
+    setError(null);
+    if (avatarRef.current) avatarRef.current.value = '';
+    if (screenshotRef.current) screenshotRef.current.value = '';
+  };
+
+  const startEdit = (t: StoredTestimonial) => {
+    setEditId(t.id);
+    setForm({ author: t.author, role: t.role || '', quote: t.quote, socialLink: t.social_link || '' });
+    setAvatarPreview(t.avatar_url || '');
+    setScreenshotPreview(t.screenshot_url || '');
+    setError(null);
+    setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.author || !form.quote) return;
     setSaving(true);
     setError(null);
 
-    const { error } = await supabase.from('testimonials').insert({
+    const payload = {
       author: form.author,
       role: form.role,
       quote: form.quote,
       avatar_url: avatarPreview || null,
       screenshot_url: screenshotPreview || null,
       social_link: form.socialLink || null,
-    });
+    };
+
+    const { error } = editId
+      ? await supabase.from('testimonials').update(payload).eq('id', editId)
+      : await supabase.from('testimonials').insert(payload);
 
     if (error) {
       setError(error.message);
     } else {
-      setForm({ author: '', role: '', quote: '', socialLink: '' });
-      setAvatarPreview('');
-      setScreenshotPreview('');
-      if (avatarRef.current) avatarRef.current.value = '';
-      if (screenshotRef.current) screenshotRef.current.value = '';
+      resetForm();
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
       fetchTestimonials();
@@ -156,6 +179,7 @@ const AdminTestimonials: React.FC = () => {
   const handleDelete = async (id: string) => {
     await supabase.from('testimonials').delete().eq('id', id);
     setDeleteId(null);
+    if (editId === id) resetForm();
     fetchTestimonials();
   };
 
@@ -164,14 +188,27 @@ const AdminTestimonials: React.FC = () => {
       <div className="max-w-3xl mx-auto px-4">
 
         {/* Header */}
-        <div className="mb-10">
+        <div ref={formRef} className="mb-10">
           <p className="text-primary font-bold uppercase tracking-[0.3em] text-[10px] mb-2">Admin Panel</p>
-          <h1 className="font-serif text-4xl text-slate-900 dark:text-white">Add Testimonial</h1>
+          <h1 className="font-serif text-4xl text-slate-900 dark:text-white">
+            {editId ? 'Edit Testimonial' : 'Add Testimonial'}
+          </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">Testimonials saved here appear instantly on the Success Stories page on all devices.</p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="bg-white dark:bg-surface-dark border dark:border-white/5 p-8 mb-12 space-y-6">
+
+          {editId && (
+            <div className="flex items-center justify-between bg-primary/10 border border-primary/30 px-4 py-3">
+              <span className="text-primary text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                <i className="fas fa-pen"></i> Editing testimonial
+              </span>
+              <button type="button" onClick={resetForm} className="text-slate-400 hover:text-slate-600 text-xs uppercase tracking-widest transition-colors">
+                Cancel
+              </button>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
@@ -261,11 +298,16 @@ const AdminTestimonials: React.FC = () => {
               disabled={saving}
               className="px-10 py-4 bg-primary text-black font-bold uppercase tracking-[0.2em] text-xs hover:bg-primary/80 transition-all disabled:opacity-50"
             >
-              {saving ? 'Saving…' : 'Add Testimonial'}
+              {saving ? 'Saving…' : editId ? 'Save Changes' : 'Add Testimonial'}
             </button>
+            {editId && (
+              <button type="button" onClick={resetForm} className="px-6 py-4 border dark:border-white/10 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] text-xs hover:border-slate-400 transition-all">
+                Cancel
+              </button>
+            )}
             {saved && (
               <span className="text-primary text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                <i className="fas fa-check"></i> Saved!
+                <i className="fas fa-check"></i> {editId ? 'Updated!' : 'Saved!'}
               </span>
             )}
           </div>
@@ -283,7 +325,7 @@ const AdminTestimonials: React.FC = () => {
             </h2>
             <div className="space-y-4">
               {testimonials.map(t => (
-                <div key={t.id} className="bg-white dark:bg-surface-dark border dark:border-white/5 p-6 flex items-start gap-5">
+                <div key={t.id} className={`bg-white dark:bg-surface-dark border p-6 flex items-start gap-5 transition-all ${editId === t.id ? 'border-primary' : 'dark:border-white/5'}`}>
                   {t.avatar_url ? (
                     <img src={t.avatar_url} alt={t.author} className="w-12 h-12 rounded-full object-cover grayscale flex-shrink-0" />
                   ) : (
@@ -308,6 +350,13 @@ const AdminTestimonials: React.FC = () => {
                             <i className="fas fa-link"></i>
                           </a>
                         )}
+                        <button
+                          onClick={() => startEdit(t)}
+                          className="text-slate-400 hover:text-primary transition-colors text-xs"
+                          title="Edit"
+                        >
+                          <i className="fas fa-pen"></i>
+                        </button>
                         {deleteId === t.id ? (
                           <span className="flex items-center gap-2 text-xs">
                             <button onClick={() => handleDelete(t.id)} className="text-red-400 font-bold uppercase tracking-widest hover:text-red-300 transition-colors">Delete</button>
