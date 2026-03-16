@@ -44,20 +44,39 @@ const QuoteText: React.FC<{ quote: string }> = ({ quote }) => {
   );
 };
 
+const isValidUrl = (url: string) => {
+  try { new URL(url); return true; } catch { return false; }
+};
+
 const SuccessStories: React.FC = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [highlighted, setHighlighted] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchTestimonials = () => {
+    setLoadError(false);
+    setLoading(true);
+    let isMounted = true;
     supabase
       .from('testimonials')
       .select('*')
       .order('created_at', { ascending: false })
-      .then(({ data }) => {
-        if (data) setTestimonials(data);
+      .then(({ data, error }) => {
+        if (!isMounted) return;
+        if (error) {
+          setLoadError(true);
+        } else if (data) {
+          setTestimonials(data);
+        }
         setLoading(false);
       });
+    return () => { isMounted = false; };
+  };
+
+  useEffect(() => {
+    const cleanup = fetchTestimonials();
+    return cleanup;
   }, []);
 
   const scrollToTestimonial = (id: string) => {
@@ -102,6 +121,7 @@ const SuccessStories: React.FC = () => {
                       src={t.screenshot_url || t.avatar_url}
                       alt={t.author}
                       className="w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105"
+                      onError={e => { (e.target as HTMLImageElement).closest('div')?.remove(); }}
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-end p-3 opacity-0 group-hover:opacity-100">
                       <p className="text-white text-xs font-bold uppercase tracking-widest truncate">{t.author}</p>
@@ -116,6 +136,17 @@ const SuccessStories: React.FC = () => {
         {loading ? (
           <div className="text-center py-20 text-slate-400">
             <p className="text-sm uppercase tracking-widest">Loading…</p>
+          </div>
+        ) : loadError ? (
+          <div className="text-center py-20 text-slate-400">
+            <i className="fas fa-exclamation-circle text-3xl mb-4 block opacity-40"></i>
+            <p className="text-sm uppercase tracking-widest mb-4">Could not load testimonials</p>
+            <button
+              onClick={fetchTestimonials}
+              className="text-primary text-xs font-bold uppercase tracking-widest hover:text-primary/70 transition-colors"
+            >
+              Try again
+            </button>
           </div>
         ) : testimonials.length === 0 ? (
           <div className="text-center py-20 text-slate-400">
@@ -145,6 +176,7 @@ const SuccessStories: React.FC = () => {
                       src={t.screenshot_url}
                       alt="Social media testimonial"
                       className="w-full rounded object-contain border dark:border-white/5 max-h-48"
+                      onError={e => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
                     />
                   </div>
                 )}
@@ -157,6 +189,7 @@ const SuccessStories: React.FC = () => {
                       src={t.avatar_url}
                       alt={t.author}
                       className="w-11 h-11 rounded-full object-cover grayscale flex-shrink-0"
+                      onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                   ) : (
                     <div className="w-11 h-11 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
@@ -168,7 +201,7 @@ const SuccessStories: React.FC = () => {
                       <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider truncate">
                         {t.author}
                       </h4>
-                      {t.social_link && (
+                      {t.social_link && isValidUrl(t.social_link) && (
                         <a href={t.social_link} target="_blank" rel="noopener noreferrer" className="text-primary/50 hover:text-primary transition-colors flex-shrink-0">
                           <i className="fas fa-link text-[10px]"></i>
                         </a>

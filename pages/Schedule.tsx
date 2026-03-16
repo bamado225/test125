@@ -2,17 +2,20 @@
 import React, { useState } from 'react';
 
 const Schedule: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<number | null>(4);
-  const [selectedTime, setSelectedTime] = useState<string | null>('2:00 PM');
+  const [selectedDate, setSelectedDate] = useState<number | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
-  const calendarDays = Array.from({ length: 31 }, (_, i) => i + 1);
+  const now = new Date();
+  const monthLabel = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const calendarDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
   const times = ['10:00 AM', '12:30 PM', '2:00 PM', '4:30 PM', '6:00 PM'];
 
   return (
     <div className="pt-32 pb-24 bg-slate-50 dark:bg-background-dark min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
-          
+
           <div className="animate-fade-in-up">
             <h5 className="text-primary font-bold tracking-[0.3em] uppercase text-[10px] mb-4">Elevate Your Career</h5>
             <h1 className="font-serif text-4xl md:text-6xl text-slate-900 dark:text-white leading-tight mb-8">
@@ -57,7 +60,7 @@ const Schedule: React.FC = () => {
             <div className="mb-10 p-6 bg-slate-50 dark:bg-black/20 rounded-lg">
               <div className="flex justify-between items-center mb-8 px-2">
                 <button className="text-slate-400 hover:text-primary"><i className="fas fa-chevron-left"></i></button>
-                <span className="font-bold text-slate-800 dark:text-white uppercase tracking-widest text-xs">October 2024</span>
+                <span className="font-bold text-slate-800 dark:text-white uppercase tracking-widest text-xs">{monthLabel}</span>
                 <button className="text-slate-400 hover:text-primary"><i className="fas fa-chevron-right"></i></button>
               </div>
               <div className="grid grid-cols-7 gap-2 text-center text-[10px] uppercase font-bold text-slate-400 mb-4">
@@ -69,8 +72,8 @@ const Schedule: React.FC = () => {
                     key={day}
                     onClick={() => setSelectedDate(day)}
                     className={`h-10 text-xs rounded transition-all flex items-center justify-center ${
-                      selectedDate === day 
-                        ? 'bg-primary text-black font-bold shadow-lg shadow-primary/20' 
+                      selectedDate === day
+                        ? 'bg-primary text-black font-bold shadow-lg shadow-primary/20'
                         : 'text-slate-500 hover:bg-primary/10 hover:text-primary'
                     }`}
                   >

@@ -19,6 +19,10 @@ const readFile = (file: File, setter: (v: string) => void) => {
   reader.readAsDataURL(file);
 };
 
+const isValidUrl = (url: string) => {
+  try { new URL(url); return true; } catch { return false; }
+};
+
 const ImageUpload: React.FC<{
   label: string;
   hint?: string;
@@ -98,7 +102,6 @@ const ImageUpload: React.FC<{
 };
 
 const ADMIN_PASSWORD = 'Emom78#$$%';
-
 const emptyForm = { author: '', role: '', quote: '', socialLink: '' };
 
 const AdminTestimonials: React.FC = () => {
@@ -111,26 +114,34 @@ const AdminTestimonials: React.FC = () => {
   const [screenshotPreview, setScreenshotPreview] = useState<string>('');
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [urlError, setUrlError] = useState<string | null>(null);
   const avatarRef = useRef<HTMLInputElement>(null);
   const screenshotRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
 
   const fetchTestimonials = async () => {
+    setLoadError(false);
     const { data, error } = await supabase
       .from('testimonials')
       .select('*')
       .order('created_at', { ascending: false });
-    if (!error && data) setTestimonials(data);
+    if (error) {
+      setLoadError(true);
+    } else if (data) {
+      setTestimonials(data);
+    }
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchTestimonials();
-  }, []);
+    if (unlocked) fetchTestimonials();
+  }, [unlocked]);
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -138,6 +149,7 @@ const AdminTestimonials: React.FC = () => {
     setScreenshotPreview('');
     setEditId(null);
     setError(null);
+    setUrlError(null);
     if (avatarRef.current) avatarRef.current.value = '';
     if (screenshotRef.current) screenshotRef.current.value = '';
   };
@@ -148,19 +160,28 @@ const AdminTestimonials: React.FC = () => {
     setAvatarPreview(t.avatar_url || '');
     setScreenshotPreview(t.screenshot_url || '');
     setError(null);
+    setUrlError(null);
     setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.author || !form.quote) return;
+
+    // Validate URL if provided
+    if (form.socialLink && !isValidUrl(form.socialLink)) {
+      setUrlError('Please enter a valid URL (e.g. https://instagram.com/username)');
+      return;
+    }
+
     setSaving(true);
     setError(null);
+    setUrlError(null);
 
     const payload = {
-      author: form.author,
-      role: form.role,
-      quote: form.quote,
+      author: form.author.trim(),
+      role: form.role.trim(),
+      quote: form.quote.trim(),
       avatar_url: avatarPreview || null,
       screenshot_url: screenshotPreview || null,
       social_link: form.socialLink || null,
@@ -182,10 +203,15 @@ const AdminTestimonials: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from('testimonials').delete().eq('id', id);
-    setDeleteId(null);
-    if (editId === id) resetForm();
-    fetchTestimonials();
+    setDeleteError(null);
+    const { error } = await supabase.from('testimonials').delete().eq('id', id);
+    if (error) {
+      setDeleteError('Failed to delete. Please try again.');
+    } else {
+      setDeleteId(null);
+      if (editId === id) resetForm();
+      fetchTestimonials();
+    }
   };
 
   if (!unlocked) {
@@ -268,6 +294,7 @@ const AdminTestimonials: React.FC = () => {
                 value={form.author}
                 onChange={e => setForm(f => ({ ...f, author: e.target.value }))}
                 required
+                maxLength={100}
                 placeholder="e.g. Jane Smith"
                 className="w-full bg-slate-50 dark:bg-background-dark border dark:border-white/10 px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary transition-colors"
               />
@@ -280,6 +307,7 @@ const AdminTestimonials: React.FC = () => {
                 type="text"
                 value={form.role}
                 onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
+                maxLength={100}
                 placeholder="e.g. Actor & Voice Artist"
                 className="w-full bg-slate-50 dark:bg-background-dark border dark:border-white/10 px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary transition-colors"
               />
@@ -295,6 +323,7 @@ const AdminTestimonials: React.FC = () => {
               onChange={e => setForm(f => ({ ...f, quote: e.target.value }))}
               required
               rows={5}
+              maxLength={2000}
               placeholder="Enter the testimonial text..."
               className="w-full bg-slate-50 dark:bg-background-dark border dark:border-white/10 px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary transition-colors resize-none"
             />
@@ -328,12 +357,15 @@ const AdminTestimonials: React.FC = () => {
               Social Media Link <span className="text-slate-400 font-normal normal-case tracking-normal">(optional)</span>
             </label>
             <input
-              type="url"
+              type="text"
               value={form.socialLink}
-              onChange={e => setForm(f => ({ ...f, socialLink: e.target.value }))}
+              onChange={e => { setForm(f => ({ ...f, socialLink: e.target.value })); setUrlError(null); }}
               placeholder="https://instagram.com/username"
-              className="w-full bg-slate-50 dark:bg-background-dark border dark:border-white/10 px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary transition-colors"
+              className={`w-full bg-slate-50 dark:bg-background-dark border px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none transition-colors ${
+                urlError ? 'border-red-400' : 'dark:border-white/10 focus:border-primary'
+              }`}
             />
+            {urlError && <p className="mt-1 text-red-400 text-xs">{urlError}</p>}
           </div>
 
           {error && (
@@ -366,11 +398,22 @@ const AdminTestimonials: React.FC = () => {
           <div className="text-center py-16 text-slate-400">
             <p className="text-sm uppercase tracking-widest">Loading…</p>
           </div>
+        ) : loadError ? (
+          <div className="text-center py-16 text-slate-400">
+            <i className="fas fa-exclamation-circle text-3xl mb-4 block opacity-40"></i>
+            <p className="text-sm uppercase tracking-widest mb-4">Could not load testimonials</p>
+            <button onClick={fetchTestimonials} className="text-primary text-xs font-bold uppercase tracking-widest hover:text-primary/70 transition-colors">
+              Try again
+            </button>
+          </div>
         ) : testimonials.length > 0 ? (
           <div>
             <h2 className="font-serif text-2xl text-slate-900 dark:text-white mb-6">
               Saved Testimonials <span className="text-primary">({testimonials.length})</span>
             </h2>
+            {deleteError && (
+              <p className="text-red-400 text-xs uppercase tracking-widest mb-4">{deleteError}</p>
+            )}
             <div className="space-y-4">
               {testimonials.map(t => (
                 <div key={t.id} className={`bg-white dark:bg-surface-dark border p-6 flex items-start gap-5 transition-all ${editId === t.id ? 'border-primary' : 'dark:border-white/5'}`}>
@@ -393,7 +436,7 @@ const AdminTestimonials: React.FC = () => {
                         )}
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
-                        {t.social_link && (
+                        {t.social_link && isValidUrl(t.social_link) && (
                           <a href={t.social_link} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors text-xs">
                             <i className="fas fa-link"></i>
                           </a>
@@ -408,10 +451,10 @@ const AdminTestimonials: React.FC = () => {
                         {deleteId === t.id ? (
                           <span className="flex items-center gap-2 text-xs">
                             <button onClick={() => handleDelete(t.id)} className="text-red-400 font-bold uppercase tracking-widest hover:text-red-300 transition-colors">Delete</button>
-                            <button onClick={() => setDeleteId(null)} className="text-slate-400 uppercase tracking-widest hover:text-slate-300 transition-colors">Cancel</button>
+                            <button onClick={() => { setDeleteId(null); setDeleteError(null); }} className="text-slate-400 uppercase tracking-widest hover:text-slate-300 transition-colors">Cancel</button>
                           </span>
                         ) : (
-                          <button onClick={() => setDeleteId(t.id)} className="text-slate-300 dark:text-slate-600 hover:text-red-400 transition-colors text-xs">
+                          <button onClick={() => { setDeleteId(t.id); setDeleteError(null); }} className="text-slate-300 dark:text-slate-600 hover:text-red-400 transition-colors text-xs">
                             <i className="fas fa-trash"></i>
                           </button>
                         )}
